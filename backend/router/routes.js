@@ -9,6 +9,12 @@ router.route('/').get((req, res) => {
     res.send("Let's Chat");
 });
 
+// This is a custom middle ware for calling the json parser function
+// function middleware(req, res, next) {
+//     let parse = express.json();
+//     parse(req, res, next);
+// }
+
 router.route('/login').post(express.json(), login);
 
 router.route('/register').post(express.json(), register);
