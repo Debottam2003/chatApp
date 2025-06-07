@@ -1,4 +1,9 @@
 import { users } from '../db/models.js'
+import jwt from 'jsonwebtoken'
+import dotenv from 'dotenv'
+
+dotenv.config();
+
 export const login = async (req, res) => {
     let { email, password } = req.body;
     if (!email || !password) {
@@ -9,9 +14,12 @@ export const login = async (req, res) => {
     else {
         try {
             console.log(email, password);
-            let data = await users.findOne({ "email": email }, { "email": 1, "password": 1, "_id": 0 });
+            let data = await users.findOne({ "email": email }).select('email password _id');
             console.log(data);
             if (password === data.password) {
+                console.log("correct password");
+                let jwttoken = jwt.sign({ "_id": data._id }, process.env.SECRET);
+                res.cookie("jwt", jwttoken, { maxAge: 5 * 60 * 1000, httpOnly: true, sameSite: "strict" });
                 res.status(200).json({
                     message: "Welcome back!"
                 });
@@ -23,6 +31,7 @@ export const login = async (req, res) => {
             }
         }
         catch (err) {
+            console.log(err.message);
             return res.status(500).json({
                 message: "Internal server error"
             });
@@ -31,8 +40,8 @@ export const login = async (req, res) => {
 };
 
 export const register = async (req, res) => {
-    let { email, password, profilepic } = req.body;
-    if (!email || !password) {
+    let { username, email, password, profilepic } = req.body;
+    if (!email || !password || !username) {
         return res.status(400).json({
             message: "Provide All fields"
         });
@@ -48,7 +57,10 @@ export const register = async (req, res) => {
                 });
             }
             else {
-                await users.create({ "email": email, "password": password, "profilepic": profilepic });
+                let newuserdata = await users.create({ "username": username, "email": email, "password": password, "profilepic": profilepic });
+                console.log(newuserdata);
+                let jwttoken = jwt.sign({ "_id": newuserdata._id }, process.env.SECRET);
+                res.cookie("jwt", jwttoken, { maxAge: 5 * 60 * 1000, httpOnly: true, sameSite: "strict" });
                 res.status(200).json({
                     message: "Welcome to Let's Chat!"
                 });
