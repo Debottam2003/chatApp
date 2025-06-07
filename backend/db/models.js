@@ -21,7 +21,28 @@ let userSchema = new mongoose.Schema({
 
 export const users = mongoose.model('users', userSchema);
 
+let messageSchema = new mongoose.Schema({
+    senderId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "users",
+        required: true
+    },
+    receiverId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "users",
+        required: true
+    },
+    text: {
+        type: String,
+    },
+    image: {
+        type: String
+    }
+},
+{timestamps: true}
+);
 
+export const messages = mongoose.model('messages', messageSchema);
 
 
 
