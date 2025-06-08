@@ -4,6 +4,7 @@ import dotenv from 'dotenv'
 
 dotenv.config();
 
+// Login Handler
 export const login = async (req, res) => {
     let { email, password } = req.body;
     if (!email || !password) {
@@ -39,6 +40,7 @@ export const login = async (req, res) => {
     }
 };
 
+// Register Handler
 export const register = async (req, res) => {
     let { username, email, password, profilepic } = req.body;
     if (!email || !password || !username) {
@@ -73,3 +75,11 @@ export const register = async (req, res) => {
         }
     }
 };
+
+// Logout Handler
+export const logoutHandler = async (req, res) => {
+    res.clearCookie("jwt");
+    res.status(200).json({
+        message: "You are logged out."
+    });
+}
